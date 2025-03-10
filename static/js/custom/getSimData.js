@@ -39,6 +39,11 @@ let cabin_no_smoking_alert_switch;
 
 let light_taxi;
 
+//Maps Size Fix Function
+let map_size_fix;
+let map_size_fix_mod;
+map_size_fix = 0;
+
 window.setInterval(function(){
     getSimulatorData();
     displayData()
@@ -49,51 +54,12 @@ window.setInterval(function(){
 function getSimulatorData() {
     $.getJSON($SCRIPT_ROOT + '/ui', {}, function(data) {
 
-        //Navigation
-        altitude = data.ALTITUDE;
-        vertical_speed = data.VERTICAL_SPEED;
-        compass = data.MAGNETIC_COMPASS + data.MAGVAR;
-        airspeed = data.AIRSPEED_INDICATED;
+        // SIM DATA
+        sim_rate = data.SIMULATION_RATE;
+
+        // Position Data
         latitude = data.LATITUDE;
         longitude = data.LONGITUDE;
-
-        //Fuel
-        fuel_percentage = data.FUEL_PERCENTAGE;
-
-        //Autopilot
-        autopilot_master = data.AUTOPILOT_MASTER;
-        autopilot_nav_selected = data.AUTOPILOT_NAV_SELECTED;
-        autopilot_wing_leveler = data.AUTOPILOT_WING_LEVELER;
-        autopilot_heading_lock = data.AUTOPILOT_HEADING_LOCK;
-        autopilot_heading_lock_dir = data.AUTOPILOT_HEADING_LOCK_DIR;
-        autopilot_altitude_lock = data.AUTOPILOT_ALTITUDE_LOCK;
-        autopilot_altitude_lock_var = data.AUTOPILOT_ALTITUDE_LOCK_VAR;
-        autopilot_attitude_hold = data.AUTOPILOT_ATTITUDE_HOLD;
-        autopilot_glidescope_hold = data.AUTOPILOT_GLIDESLOPE_HOLD;
-        autopilot_approach_hold = data.AUTOPILOT_APPROACH_HOLD;
-        autopilot_backcourse_hold = data.AUTOPILOT_BACKCOURSE_HOLD;
-        autopilot_vertical_hold = data.AUTOPILOT_VERTICAL_HOLD
-        autopilot_vertical_hold_var = data.AUTOPILOT_VERTICAL_HOLD_VAR;
-        autopilot_pitch_hold = data.AUTOPILOT_PITCH_HOLD;
-        autopilot_pitch_hold_ref = data.AUTOPILOT_PITCH_HOLD_REF;
-        autopilot_flight_director_active = data.AUTOPILOT_FLIGHT_DIRECTOR_ACTIVE;
-        autopilot_airspeed_hold = data.AUTOPILOT_AIRSPEED_HOLD;
-        autopilot_airspeed_hold_var = data.AUTOPILOT_AIRSPEED_HOLD_VAR;
-
-        //Control surfaces
-        gear_handle_position = data.GEAR_HANDLE_POSITION;
-        elevator_trim_pct = data.ELEVATOR_TRIM_PCT;
-        elevator_trim_pct_reversed = - elevator_trim_pct
-        //rudder_trim_pct = data.RUDDER_TRIM_PCT;
-        flaps_handle_pct = data.FLAPS_HANDLE_PERCENT;
-        flaps_handle_pct_reversed = - flaps_handle_pct;
-
-        //Cabin
-        cabin_no_smoking_alert_switch = data.CABIN_NO_SMOKING_ALERT_SWITCH;
-        cabin_seatbelts_alert_switch = data.CABIN_SEATBELTS_ALERT_SWITCH;
-
-        //Panel
-        light_taxi = data.LIGHT_TAXI;
 
     });
     return false;
@@ -101,6 +67,10 @@ function getSimulatorData() {
 
 
 function displayData() {
+    // SIM DATA
+    $("#sim-rate").text(sim_rate);
+
+
     //Navigation
     $("#altitude").text(altitude);
     $("#compass").text(compass);
@@ -216,6 +186,12 @@ function mapRefreshFix() {
 	};
 	
 	map_size_fix = map_size_fix * 1;
+}
+
+function refreshMapSize() {
+	setInterval(function () {
+	map.invalidateSize();
+	}, 1000);
 }
 
 function setSimDatapoint(datapointToSet, valueToUse) {

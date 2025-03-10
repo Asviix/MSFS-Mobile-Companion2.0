@@ -1,0 +1,29 @@
+<div class="collapse" id="collapseOptions" data-bs-parent="#myGroup">
+    <div class="card bg-dark text-white" style="margin-top: 10px;margin-bottom: 12px;">
+        <div class="card-body">
+
+            <!-- First Row -->
+             <div class="row" style="margin-top: -23px;">
+
+                <!-- Aircraft Selection -->
+                 <div class="col" style="margin-top: 20px;">
+                    <div class="lead" style="margin-bottom: 10px;">Select Aircraft</div>
+                    <form method="POST" action="{% if request.path == '/' %}{{ url_for('.index') }}{% else %} {{ url_for('index_landscape') }}{% endif %}">
+                        <div class="form-group">
+                            <select name="plane_selected" class="form-control">
+                                {% for i in planes_list %}
+                                    <option value="{{ i }}" {% if i == selected_plane %} selected {% endif %}>{{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0px">
+                            <button type="submit" class="btn btn-secondary">Load Aircraft</button>
+                        </div>
+                    </form>
+                </div>
+
+                <hr class="bg-secondary">                
+            </div>
+        </div>
+    </div>
+</div>
