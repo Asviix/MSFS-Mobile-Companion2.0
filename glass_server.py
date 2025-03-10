@@ -47,15 +47,22 @@ def flask_thread_func(threadname):
 		"Robin DR400-160B w/ Tablet"
 	]
 	planes_dict = {
-		"Default": [["NAV", "nav"], ["COM", "com"], ["AP", "ap"], ["Lights", "lights"], ["other", "other"]],
+		"Default": [
+			["NAV", "nav"],
+			["COM", "com"],
+			["AP", "ap"],
+			["Panel", "panel"],
+			["Other", "other"]
+		],
+		
 		"Robin DR400-160B w/ Tablet": [
 			["NAV", "dr40-160b-nav"],
 			["COM", "dr40-160b-com"],
 			["AP", "dr40-160b-ap"],
-			["lights", "dr40-160b-lights"],
+			["Lights", "dr40-160b-lights"],
 			["Electrical", "dr40-160b-electrical"],
 			["Fuel", "dr40-160b-fuel"],
-			["other", "dr40-160b-other"]
+			["Other", "dr40-160b-other"]
 		]
 	}
 
@@ -316,8 +323,33 @@ def simconnect_thread_func(threadname):
 		asyncio.run(ui_dictionnary(ui_friendly_dictionary, previous_alt))
 		sleep(0.3)
 
+def simconnect_thread_func2(threadname):
+
+	global ui_friendly_dictionary
+
+	while True:
+		try:
+			sm = SimConnect()
+			break
+		except:
+			None
+
+	ae = AircraftEvents(sm)
+	aq = AircraftRequests(sm)
+
+	def thousandify(x):
+		return f"{x:,}"
+	
+	async def ui_dictionary(ui_friendly_dictionary):
+		# Additional for performance
+		ui_friendly_dictionary["LATITUDE"] = round(aq.get("PLANE_LATITUDE"), 6)
+		ui_friendly_dictionary["LONGITUDE"] = round(aq.get("PLANE_LONGITUDE"), 6)
+
+	while True:
+		asyncio.run(ui_dictionary(ui_friendly_dictionary))
+
 # SimConnect LVAR Reading
-def simconnect_thread_func2(thread3):
+def simconnect_thread_func3(threadname):
 
 	global ui_friendly_dictionary
 	global selected_plane
@@ -367,11 +399,13 @@ def read_file(filename, directory=cwd):
 	return contents
 
 if __name__ == "__main__":
-	thread1 = Thread(target=simconnect_thread_func, args=('Thread-1', ))
-	thread2 = Thread(target=flask_thread_func, args=('Thread-2', ))
+	thread1 = Thread(target=flask_thread_func, args=('Thread-1', ))
+	thread2 = Thread(target=simconnect_thread_func, args=('Thread-2', ))
 	thread3 = Thread(target=simconnect_thread_func2, args=('Thread-3', ))
+	thread4 = Thread(target=simconnect_thread_func3, args=('Thread-4', ))
 	thread1.start()
 	thread2.start()
 	thread3.start()
+	thread4.start()
 
 	sleep(0.5)

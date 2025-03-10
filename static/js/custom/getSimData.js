@@ -4,7 +4,9 @@ let vertical_speed;
 let compass;
 let airspeed;
 let latitude;
+latitude = 0;
 let longitude;
+longitude = 0;
 
 let autopilot_master;
 let autopilot_nav_selected;
@@ -51,7 +53,7 @@ function getSimulatorData() {
         altitude = data.ALTITUDE;
         vertical_speed = data.VERTICAL_SPEED;
         compass = data.MAGNETIC_COMPASS + data.MAGVAR;
-        airspeed = data.AIRSPEED_INDICATE;
+        airspeed = data.AIRSPEED_INDICATED;
         latitude = data.LATITUDE;
         longitude = data.LONGITUDE;
 
@@ -170,18 +172,30 @@ function toggleFollowPlane() {
     followPlane = !followPlane;
     if (followPlane === true) {
         $("#followMode").text("Moving map enabled")
-        $("#followModeButton").removeClass("btn-outline-danger").addClass("btn-primary")
+        $("#followModeButton").removeClass("btn-danger").addClass("btn-primary")
     }
     if (followPlane === false) {
         $("#followMode").text("Moving map disabled")
-        $("#followModeButton").removeClass("btn-primary").addClass("btn-outline-danger")
+        $("#followModeButton").removeClass("btn-primary").addClass("btn-danger")
+    }
+}
+
+function toggleGPStrack() {
+    trackGPS = !trackGPS;
+    if (trackGPS === true) {
+        $("#GPStrackButton").removeClass("btn-danger").addClass("btn-primary");
+        trackline.setStyle({opacity: 1.0});
+    }
+    if (trackGPS === false) {
+        $("#GPStrackButton").removeClass("btn-primary").addClass("btn-danger")
+        trackline.setStyle({opacity: 0});
     }
 }
 
 function updateMap() {
     var pos = L.latLng(latitude, longitude);
 
-    marker.slideTo(	pos, {
+    marker.setLatLng(pos, {
         duration: 1500,
     });
     marker.setRotationAngle(compass);
@@ -189,6 +203,19 @@ function updateMap() {
     if (followPlane === true) {
         map.panTo(pos);
     }
+}
+
+function mapRefreshFix() {
+	map_size_fix = map_size_fix + 1;
+	map_size_fix_mod = map_size_fix % 2;
+	
+	if (map_size_fix_mod = 0) {
+		$('#map_row').height('+=1');
+	} else {
+		$('#map_row').height('-=1');
+	};
+	
+	map_size_fix = map_size_fix * 1;
 }
 
 function setSimDatapoint(datapointToSet, valueToUse) {
