@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- JQuery UI -->
+<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
+
+<!-- Script Root -->
+<script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
+<!-- getSimData.js -->
+<script src="/static/js/custom/getSimData.js"></script> 
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            font-size: 16px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+        <div class="container">
+        <h1>Test Button</h1>
+        <button onclick="triggerSimEvent('TOGGLE_TAXI_LIGHTS',0,true);$(this).blur();" id="light-taxi" type="button" class="btn btn-danger" style="width:55px">?</button>
+    </div>
+</body>
+</html>

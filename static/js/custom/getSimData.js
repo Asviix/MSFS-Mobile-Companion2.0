@@ -35,6 +35,8 @@ let flaps_handle_pct_reversed;
 let cabin_seatbelts_alert_switch;
 let cabin_no_smoking_alert_switch;
 
+let light_taxi;
+
 window.setInterval(function(){
     getSimulatorData();
     displayData()
@@ -88,6 +90,9 @@ function getSimulatorData() {
         cabin_no_smoking_alert_switch = data.CABIN_NO_SMOKING_ALERT_SWITCH;
         cabin_seatbelts_alert_switch = data.CABIN_SEATBELTS_ALERT_SWITCH;
 
+        //Panel
+        light_taxi = data.LIGHT_TAXI;
+
     });
     return false;
 }
@@ -114,6 +119,7 @@ function displayData() {
     checkAndUpdateButton("#autopilot-backcourse-hold", autopilot_backcourse_hold);
     checkAndUpdateButton("#autopilot-approach-hold", autopilot_approach_hold);
     checkAndUpdateButton("#autopilot-vertical-hold", autopilot_vertical_hold);
+    checkAndUpdateButton("#light-taxi", light_taxi);
 
     $("#autopilot-heading-lock-dir").attr('placeholder', autopilot_heading_lock_dir);
     $("#autopilot-altitude-lock-var").attr('placeholder', autopilot_altitude_lock_var);

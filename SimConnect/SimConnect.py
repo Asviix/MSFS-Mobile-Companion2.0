@@ -1,4 +1,5 @@
 from ctypes import *
+import ctypes
 from ctypes.wintypes import *
 import logging
 import time
@@ -181,7 +182,7 @@ class SimConnect:
 				self.dll.CallDispatch(self.hSimConnect, self.my_dispatch_proc_rd, None)
 				time.sleep(.002)
 			except OSError as err:
-        			print("OS error: {0}".format(err))
+				print("OS error: {0}".format(err))
 
 	def exit(self):
 		self.quit = 1

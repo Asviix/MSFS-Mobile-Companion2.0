@@ -206,11 +206,6 @@ def simconnect_thread_func(threadname):
 
 	async def ui_dictionnary(ui_friendly_dictionary, previous_alt):
 		# Radios
-		ui_friendly_dictionary["NAV1_STANDBY"] = round(aq.get("NAV_STANDBY_FREQUENCY:1"), 2)
-		ui_friendly_dictionary["NAV1_ACTIVE"] = round(aq.get("NAV_ACTIVE_FREQUENCY:1"), 2)
-
-		ui_friendly_dictionary["NAV2_STANDBY"] = round(aq.get("NAV_STANDBY_FREQUENCY:2"), 2)
-		ui_friendly_dictionary["NAV2_ACTIVE"] = round(aq.get("NAV_ACTIVE_FREQUENCY:2"), 2)
 
 		# ADF Active
 		adf_use_bcd = int(aq.get("ADF_ACTIVE_FREQUENCY:1"))
@@ -321,37 +316,8 @@ def simconnect_thread_func(threadname):
 		asyncio.run(ui_dictionnary(ui_friendly_dictionary, previous_alt))
 		sleep(0.3)
 
-# SimConnect App 2
-def simconnect_thread_func2(threadname):
-
-	global ui_friendly_dictionary
-
-	while True:
-		try:
-			sm = SimConnect()
-			break
-		except:
-			None
-
-	ae = AircraftEvents(sm)
-	aq = AircraftRequests(sm)
-
-	def thousandify(x):
-		return f"({x:,})"
-
-	async def ui_dictionnary(ui_friendly_dictionary):
-		# Additional for performance
-		ui_friendly_dictionary["LATITUDE"] = round(aq.get("PLANE_LATITUDE"))
-		ui_friendly_dictionary["LONGITUDE"] = round(aq.get("PLANE_LONGITUDE"))
-		#ui_friendly_dictionary["AUTOPILOT_HEADING_LOCK_DIR"] = round(aq.get("AUTOPILOT_HEADING_LOCK_DIR"))
-		ui_friendly_dictionary["AUTOPILOT_ALTITUDE_LOCK_VAR"] = thousandify(round(aq.get("AUTOPILOT_ALTITUDE_LOCK_VAR")))
-		ui_friendly_dictionary["AUTOPILOT_VERTICAL_HOLD_VAR"] = aq.get("AUTOPILOT_VERTICAL_HOLD_VAR")
-		ui_friendly_dictionary["AUTOPILOT_AIRPSPEED_HOLD_VAR"] = round(aq.get("AUTOPILOT_AIRSPEED_HOLD_VAR"))
-	while True:
-		asyncio.run(ui_dictionnary(ui_friendly_dictionary))
-
 # SimConnect LVAR Reading
-def simconnect_thread_func3(threadname):
+def simconnect_thread_func2(thread3):
 
 	global ui_friendly_dictionary
 	global selected_plane
@@ -404,10 +370,8 @@ if __name__ == "__main__":
 	thread1 = Thread(target=simconnect_thread_func, args=('Thread-1', ))
 	thread2 = Thread(target=flask_thread_func, args=('Thread-2', ))
 	thread3 = Thread(target=simconnect_thread_func2, args=('Thread-3', ))
-	thread4 = Thread(target=simconnect_thread_func3, args=('Thread-4', ))
 	thread1.start()
 	thread2.start()
 	thread3.start()
-	thread4.start()
 
 	sleep(0.5)
