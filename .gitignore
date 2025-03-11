@@ -12,7 +12,3 @@ SimConnect/SimConnect.dll_old
 SimConnect/SimConnect.dll
 glass_server.spec
 build.bat
-requirements_dev.txt
-requirements.txt
-setup.cfg
-setup.py
