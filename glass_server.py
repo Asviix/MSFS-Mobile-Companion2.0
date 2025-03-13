@@ -13,8 +13,6 @@ from threading import Thread
 import datetime
 import os
 
-print(socket.gethostbyname(socket.gethostname()))
-
 ui_friendly_dictionary = {}
 event_name = None
 value_to_use = None
@@ -42,10 +40,20 @@ def flask_thread_func(threadname):
 	global ae
 
 	# Define Supported Aircraft
-	planes_list = [
-		"Default",
-		"Robin DR400-160B w/ Tablet"
-	]
+	planes_list = {
+		"Default": {
+			"Default"
+		},
+
+		"Single-Engine Prop": {
+			"Robin DR400-100 Cadet"
+		},
+
+		"Single-Engine Turbo Prop": {
+			"Daher TBM 930"
+		}
+	}
+
 	planes_dict = {
 		"Default": [
 			["NAV", "nav"],
@@ -54,20 +62,30 @@ def flask_thread_func(threadname):
 			["Panel", "panel"],
 			["Other", "other"]
 		],
-		
-		"Robin DR400-160B w/ Tablet": [
-			["NAV", "dr40-160b-nav"],
-			["COM", "dr40-160b-com"],
-			["AP", "dr40-160b-ap"],
-			["Lights", "dr40-160b-lights"],
-			["Electrical", "dr40-160b-electrical"],
-			["Fuel", "dr40-160b-fuel"],
-			["Other", "dr40-160b-other"]
+
+		"Robin DR400-100 Cadet": [
+			["NAV", "dr40-c-nav"],
+			["COM", "dr40-c-com"],
+			["Lights", "dr40-c-lights"],
+			["Electrical", "dr40-c-electrical"],
+			["Flight Surfaces", "dr40-c-flight"],
+			["Fuel", "dr40-c-fuel"],
+			["Other", "dr40-c-other"]
+		],
+
+		"Daher TBM 930": [
+			["NAV", "tbm930-nav"],
+			["COM", "tbm930-com"],
+			["Lights", "tbm930-lights"],
+			["Electrical", "tbm930-electrical"],
+			["Flight Surfaces", "tbm930-flight"],
+			["Fuel", "tbm930-fuel"],
+			["Other", "tbm930-other"]
 		]
 	}
 
 	global selected_plane
-	selected_plane = planes_list[0]
+	selected_plane = list(planes_list.keys())[0]
 	ui_friendly_dictionary["selected_plane"] = selected_plane
 
 	app = Flask(__name__)
@@ -83,20 +101,24 @@ def flask_thread_func(threadname):
 	@app.route('/', methods=['GET', 'POST'])
 	def index():
 		global selected_plane
-		cur_plane_select = request.form.get("plane_selected")
+		cur_plane_select = request.form.get("selected_plane")
+		planes_list_flat = []
 		if cur_plane_select != None:
 			selected_plane = cur_plane_select
 			ui_friendly_dictionary["selected_plane"] = selected_plane
-		return render_template('glass.html', planes_list=planes_list, selected_plane=selected_plane, curr_plane=planes_dict[selected_plane])
+			planes_list_flat = [plane for planes in planes_list.values() for plane in planes]
+		return render_template('glass.html', planes_list_full=planes_list, planes_list=planes_list_flat, selected_plane=selected_plane, curr_plane=planes_dict[selected_plane])
 
 	@app.route('/landscape', methods=['GET', 'POST'])
 	def index_landscape():
 		global selected_plane
 		cur_plane_select = request.form.get('selected_plane')
+		planes_list_flat = []
 		if cur_plane_select != None:
 			selected_plane = cur_plane_select
 			ui_friendly_dictionary["selected_plane"] = selected_plane
-		return render_template('glass_landscape.html', planes_list=planes_list, selected_plane=selected_plane, curr_plane=planes_dict[selected_plane])
+			planes_list_flat = [plane for planes in planes_list.values() for plane in planes]
+		return render_template('glass_landscape.html', planes_list_full=planes_list, planes_list=planes_list_flat, selected_plane=selected_plane, curr_plane=planes_dict[selected_plane])
 
 	# Returns the list of available KML files
 	@app.route('/kml', methods=['GET'])
@@ -158,6 +180,7 @@ def simconnect_thread_func(threadname):
 		except:
 			print("Could not find MSFS running. Please launch MSFS first and then restart the app.")
 			sleep(5)
+			exit()
 
 	ae = AircraftEvents(sm)
 	aq = AircraftRequests(sm)
@@ -172,6 +195,7 @@ def simconnect_thread_func(threadname):
 		# POSITION DATA
 		ui_friendly_dictionary["LATITUDE"] = round(aq.get("PLANE_LATITUDE"), 6)
 		ui_friendly_dictionary["LONGITUDE"] = round(aq.get("PLANE_LONGITUDE"), 6)
+		ui_friendly_dictionary["COMPASS_MAG"] = round(aq.get("MAGNETIC_COMPASS"), 6)
 
 	while True:
 		asyncio.run(ui_dictionnary(ui_friendly_dictionary, previous_alt))

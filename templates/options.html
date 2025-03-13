@@ -1,29 +1,149 @@
+<style>
+    .dropdown-menu {
+        width: 100%;
+    }
+
+    .aircraft-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .aircraft-item {
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .aircraft-item img {
+        width: 100%;
+        height: auto;
+        max-width: 150px;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+
+    .aircraft-item img:hover {
+        transform: scale(1.05);
+    }
+
+    .category-title {
+        text-align: center;
+        font-size: 1.25rem;
+        font-weight: bold;
+        color:white;
+        margin-bottom: 10px;
+    }
+
+    .container {
+        margin-bottom: 12px;
+        margin-left: 10px;
+        margin-top: 10px
+    }
+</style>
+
 <div class="collapse" id="collapseOptions" data-bs-parent="#myGroup">
-    <div class="card bg-dark text-white" style="margin-top: 10px;margin-bottom: 12px;">
+    <div class="card bg-dark text-white"
+    style="margin-top: 10px;margin-bottom: 12px;">
         <div class="card-body">
+            <div class="container mt-5">
+                <h1>Choose an Aircraft</h1>
 
-            <!-- First Row -->
-             <div class="row" style="margin-top: -23px;">
+                <!-- Hidden input to store selected value -->
+                <input type="hidden" id="selectedAircraft" name="selected" value="">
 
-                <!-- Aircraft Selection -->
-                 <div class="col" style="margin-top: 20px;">
-                    <div class="lead" style="margin-bottom: 10px;">Select Aircraft</div>
-                    <form method="POST" action="{% if request.path == '/' %}{{ url_for('.index') }}{% else %} {{ url_for('index_landscape') }}{% endif %}">
-                        <div class="form-group">
-                            <select name="plane_selected" class="form-control">
-                                {% for i in planes_list %}
-                                    <option value="{{ i }}" {% if i == selected_plane %} selected {% endif %}>{{ i }}</option>
-                                {% endfor %}
-                            </select>
+                <!-- Dropdown menu -->
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Select Aircraft
+                    </button>
+                    <div class="dropdown-menu bg-primary">
+                        <!-- Default -->
+                        <div>
+                            <p class="category-title">Default</p>
+                            <div class="aircraft-grid">
+                                <!-- Aircraft Item -->
+                                <div class="aircraft-item">
+                                    <form class="aircraftForm" method="POST" action="{% if request.path == "/" %}{{ url_for('.index') }}{% else %}{{ url_for('index_landscape') }}{% endif %}">
+                                        <input type="hidden" class="selectedAircraft" name="selected_plane" value="Default">
+                                            <p class="text-light" class="clickable" onclick="submitAircraft('Default')">Default</p>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0px">
-                            <button type="submit" class="btn btn-secondary">Load Aircraft</button>
+                        <!-- Single-Prop Planes -->
+                        <div>
+                            <p class="category-title">Single-Engine Prop Planes</p>
+                            <div class="aircraft-grid">
+                                <!-- Aircraft Items -->
+                                <div class="aircraft-item">
+                                    <form class="aircraftForm" method="POST" action="{% if request.path == "/" %}{{ url_for('.index') }}{% else %}{{ url_for('index_landscape') }}{% endif %}">
+                                        {% for i in planes_list_full["Single-Engine Prop"] %}
+                                            <input type="hidden" class="selectedAircraft" name="selected_plane" value="{{ i }}">
+                                            <img src="/static/img/planes/{{ i }}.jpg" alt="{{ i }}" class="clickable" onclick="submitAircraft('{{ i }}')">
+                                            <p class="text-light">{{ i }}</p>
+                                        {% endfor %}
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </form>
+                        <!-- Turbo-Jet Planes -->
+                        <div>
+                            <p class="category-title">Single-Engine Turbo Planes</p>
+                            <div class="aircraft-grid">
+                                <!-- Aircraft Item -->
+                                <div class="aircraft-item">
+                                    <form class="aircraftForm" method="POST" action="{% if request.path == "/" %}{{ url_for('.index') }}{% else %}{{ url_for('index_landscape') }}{% endif %}">
+                                        {% for i in planes_list_full["Single-Engine Turbo Prop"] %}
+                                            <input type="hidden" class="selectedAircraft" name="selected_plane" value="{{ i }}">
+                                            <img src="/static/img/planes/{{ i }}.jpg" alt="{{ i }}" class="clickable" onclick="submitAircraft('{{ i }}')">
+                                            <p class="text-light">{{ i }}</p>
+                                        {% endfor %}
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <hr class="bg-secondary">                
+                <!-- Display selected aircraft -->
+                <p class="mt-3">Selected Aircraft: <span id="selectedDisplay">Default</span></p>
             </div>
+
+            <hr class="bg-secondary">
+
+            <!-- Button Group for Redirects -->
+            <div class="container mt-5">Choose Display Mode:
+                <div class="btn-group" role="group" aria-label="Redirect Options">
+                    <input type="radio" class="btn-check" name="redirect" id="homeRedirect" autocomplete="off">
+                    <label class="btn btn-primary" for="homeRedirect" onclick="window.location.href='/'">Portrait</label>
+
+                    <input type="radio" class="btn-check" name="redirect" id="landscapeRedirect" autocomplete="off">
+                    <label class="btn btn-primary" for="landscapeRedirect" onclick="window.location.href='/landscape'">Landscape</label>
+                </div>
+            </div>
+
+            <hr class="bg-secondary">
+
+            <!-- Last Row Information -->
+			<div class="row" style="margin-top:15px">
+				<div class="col">
+					<p class="font-italic text-light" style="margin-bottom:0px">Follow the development on <a href="https://github.com/Asviix/MSFS-Mobile-Companion2.0" target="_blank" class="text-light">GitHub</a>.</p>
+					</div>
+			</div>
         </div>
     </div>
 </div>
+
+<script>
+    function submitAircraft(aircraftName) {
+        // Find the correct form and hidden input by dynamically targeting it
+        const form = document.querySelector(`form:has(input[name="selected_plane"][value="${aircraftName}"])`);
+        const hiddenInput = form.querySelector('input[name="selected_plane"]');
+        
+        // Set the value to the hidden input
+        hiddenInput.value = aircraftName; // Set hidden input value
+        document.getElementById("selectedDisplay").innerText = aircraftName; // Display selection
+        
+        form.submit(); // Submit the correct form
+    }
+</script>

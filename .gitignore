@@ -3,8 +3,8 @@ __pycache__/
 build/
 dist/
 SimConnect/__pycache__/
-.github
-.git
+.github/
+.git/
 
 # Files to ignore
 .*
@@ -12,3 +12,6 @@ SimConnect/SimConnect.dll_old
 SimConnect/SimConnect.dll
 glass_server.spec
 build.bat
+Makefile
+Pipfile
+Pipfile.lock

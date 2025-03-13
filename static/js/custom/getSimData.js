@@ -1,43 +1,13 @@
-let altitude;
-let fuel_percentage;
-let vertical_speed;
+// SIM DATA
+let sim_rate;
+sim_rate = 0;
+
+// POSITION DATA
 let compass;
-let airspeed;
 let latitude;
 latitude = 0;
 let longitude;
 longitude = 0;
-
-let autopilot_master;
-let autopilot_nav_selected;
-let autopilot_wing_leveler;
-let autopilot_heading_lock;
-let autopilot_heading_lock_dir;
-let autopilot_altitude_lock;
-let autopilot_altitude_lock_var;
-let autopilot_attitude_hold;
-let autopilot_glidescope_hold;
-let autopilot_approach_hold;
-let autopilot_backcourse_hold;
-let autopilot_vertical_hold;
-let autopilot_vertical_hold_var;
-let autopilot_pitch_hold;
-let autopilot_pitch_hold_ref;
-let autopilot_flight_director_active;
-let autopilot_airspeed_hold;
-let autopilot_airspeed_hold_var;
-
-let gear_handle_position;
-let elevator_trim_pct;
-let elevator_trim_pct_reversed;
-let rudder_trim_pct;
-let flaps_handle_pct;
-let flaps_handle_pct_reversed;
-
-let cabin_seatbelts_alert_switch;
-let cabin_no_smoking_alert_switch;
-
-let light_taxi;
 
 //Maps Size Fix Function
 let map_size_fix;
@@ -48,7 +18,7 @@ window.setInterval(function(){
     getSimulatorData();
     displayData()
     updateMap()
-}, 2000);
+}, 500);
 
 
 function getSimulatorData() {
@@ -57,77 +27,16 @@ function getSimulatorData() {
         // SIM DATA
         sim_rate = data.SIMULATION_RATE;
 
-        // Position Data
+        // POSITION DATA
         latitude = data.LATITUDE;
         longitude = data.LONGITUDE;
+        compass = data.COMPASS_MAG;
 
     });
     return false;
 }
 
-
-function displayData() {
-    // SIM DATA
-    $("#sim-rate").text(sim_rate);
-
-
-    //Navigation
-    $("#altitude").text(altitude);
-    $("#compass").text(compass);
-    $("#vertical-speed").text(vertical_speed);
-    $("#airspeed").text(airspeed);
-
-    //Fuel
-    $("#fuel-percentage").text(fuel_percentage);
-    $("#fuel-percentage-bar").css("width", fuel_percentage+"%");
-
-    //Autopilot
-    checkAndUpdateButton("#autopilot-master", autopilot_master, "Engaged", "Disengaged");
-    checkAndUpdateButton("#autopilot-wing-leveler", autopilot_wing_leveler);
-    checkAndUpdateButton("#autopilot-heading-lock", autopilot_heading_lock);
-    checkAndUpdateButton("#autopilot-altitude-lock", autopilot_altitude_lock);
-    checkAndUpdateButton("#autopilot-airspeed-hold", autopilot_airspeed_hold);
-    checkAndUpdateButton("#autopilot-attitude-hold", autopilot_attitude_hold);
-    checkAndUpdateButton("#autopilot-backcourse-hold", autopilot_backcourse_hold);
-    checkAndUpdateButton("#autopilot-approach-hold", autopilot_approach_hold);
-    checkAndUpdateButton("#autopilot-vertical-hold", autopilot_vertical_hold);
-    checkAndUpdateButton("#light-taxi", light_taxi);
-
-    $("#autopilot-heading-lock-dir").attr('placeholder', autopilot_heading_lock_dir);
-    $("#autopilot-altitude-lock-var").attr('placeholder', autopilot_altitude_lock_var);
-    $("#autopilot-airspeed-hold-var").attr('placeholder', autopilot_airspeed_hold_var);
-    $("#autopilot-pitch-hold-ref").attr('placeholder', autopilot_pitch_hold_ref);
-    $("#autopilot-vertical-hold-ref").attr('placeholder', autopilot_vertical_hold_var);
-
-    //Control surfaces
-    $("#gear-handle-position").html(gear_handle_position);
-    if (gear_handle_position === "UP"){
-        $("#gear-handle-position").removeClass("btn-success").addClass("btn-danger");
-    } else {
-        $("#gear-handle-position").removeClass("btn-danger").addClass("btn-success");
-    }
-
-    $("#flaps-handle-pct").text(flaps_handle_pct);
-    $("#flaps-slider").slider({values: [flaps_handle_pct_reversed]})
-
-    $("#elevator-trim-pct").text(elevator_trim_pct);
-    $("#elevator-trim-slider").slider({values: [elevator_trim_pct_reversed]})
-
-    //$("#rudder-trim-pct").text(rudder_trim_pct);
-    //$("#rudder-trim-slider").slider({values: [rudder_trim_pct]})
-
-    //Cabin
-    if (cabin_seatbelts_alert_switch === 1){
-        $("#seatbelt-sign").removeClass("btn-outline-danger").addClass("btn-danger").html("Seatbelt sign on");
-    } else {
-        $("#seatbelt-sign").removeClass("btn-danger").addClass("btn-outline-danger").html("Seatbelt sign off");
-    }
-
-    if (cabin_no_smoking_alert_switch === 1){
-        $("#no-smoking-sign").removeClass("btn-outline-danger").addClass("btn-danger").html("No smoking sign on");
-    } else {
-        $("#no-smoking-sign").removeClass("btn-danger").addClass("btn-outline-danger").html("No smoking sign off");
-    }}
+function displayData() {}
 
 function checkAndUpdateButton(buttonName, variableToCheck, onText="On", offText="Off") {
     if (variableToCheck === 1) {
@@ -137,27 +46,35 @@ function checkAndUpdateButton(buttonName, variableToCheck, onText="On", offText=
     }
 }
 
-
 function toggleFollowPlane() {
-    followPlane = !followPlane;
-    if (followPlane === true) {
-        $("#followMode").text("Moving map enabled")
-        $("#followModeButton").removeClass("btn-danger").addClass("btn-primary")
+    followPlane = followPlane + 1;
+	if (followPlane === 4) {
+		followPlane = 1
+	}
+    if (followPlane === 1) {
+        $("#followMode").text("Unfollow Plane")
+        $("#followModeButton").removeClass("btn-info btn-sm").addClass("btn-primary btn-sm")
+		marker.addTo(map);
     }
-    if (followPlane === false) {
-        $("#followMode").text("Moving map disabled")
-        $("#followModeButton").removeClass("btn-primary").addClass("btn-danger")
+    if (followPlane === 2) {
+        $("#followMode").text("Hide Plane")
+        $("#followModeButton").removeClass("btn-primary btn-sm").addClass("btn-info btn-sm")
+    }
+	if (followPlane === 3) {
+        $("#followMode").text("Show Plane")
+		$("followModeButton").removeClass("btn-primary btn-sm").addClass("btn-success btn-sm")
+		marker.remove();
     }
 }
 
 function toggleGPStrack() {
     trackGPS = !trackGPS;
     if (trackGPS === true) {
-        $("#GPStrackButton").removeClass("btn-danger").addClass("btn-primary");
+        $("#GPStrackButton").removeClass("btn-danger btn-sm").addClass("btn-primary btn-sm");
         trackline.setStyle({opacity: 1.0});
     }
     if (trackGPS === false) {
-        $("#GPStrackButton").removeClass("btn-primary").addClass("btn-danger")
+        $("#GPStrackButton").removeClass("btn-primary btn-sm").addClass("btn-danger btn-sm")
         trackline.setStyle({opacity: 0});
     }
 }
@@ -166,11 +83,11 @@ function updateMap() {
     var pos = L.latLng(latitude, longitude);
 
     marker.setLatLng(pos, {
-        duration: 1500,
+        duration: 200,
     });
     marker.setRotationAngle(compass);
 
-    if (followPlane === true) {
+    if (followPlane === 1) {
         map.panTo(pos);
     }
 }
@@ -234,7 +151,6 @@ function triggerCustomEmergency(emergency_type) {
         temporaryAlert("Fire!", "Random engine fire trigger sent", "error")
     }
 }
-
 
 function temporaryAlert(title, message, icon) {
     let timerInterval
